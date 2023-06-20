@@ -16,12 +16,13 @@ import os
 import environ
 
 
+
 env = environ.Env()
 environ.Env.read_env()
 ENVIRONMENT = env
 # Build paths inside the project like this: BASE_DIR / 'subdir'.\
     
-    
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -44,7 +45,9 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-PROJECT_APPS=[]
+PROJECT_APPS=[
+    'apps.user',
+    ]
 ECOMMERCE_APPS=[]
 THIRD_PARTY_APPS=[
     'corsheaders',
@@ -195,5 +198,17 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+AUTH_USER_MODEL="user.UserAccount"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKENDS ='django.core.mail.backends.console.EmailBackend'
+
+if not DEBUG:
+    DEFAULT_FROM_EMAIL = 'Tienda online - venta de las mercancias <junhorams@gmail.com>'
+    EMAIL_BACKENDS = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    EMAIL_PORT = env('EMAIL_PORT')
+    EMAIL_USE_TLS = env('EMAIL_USE_TLS')
