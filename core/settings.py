@@ -25,7 +25,7 @@ ENVIRONMENT = env
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os._Environ('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -52,9 +52,10 @@ THIRD_PARTY_APPS=[
     'djoser',
     'social_django',
     'rest_framework_simplejwt',
-    'rest_framework.token_blacklist',
+    'rest_framework_simplejwt.token_blacklist',
     'ckeditor',
     'ckeditor_uploader',
+    'whitenoise.runserver_nostatic',
 ]
 
 INSTALLED_APPS= DJANGO_APPS + PROJECT_APPS + ECOMMERCE_APPS + THIRD_PARTY_APPS
@@ -70,16 +71,16 @@ CKEDITOR_UPLOAD_PATH = "/media/"
 
 MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
-    'corsheaders.middleware.CoreMiddleware'
-    
-    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -111,6 +112,26 @@ DATABASES = {
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
+CORS_ORIGIN_WHITELIST = [
+    'https://localhost:3000',
+    'https://localhost:8000',
+    'https://127.0.0.1:8000',
+    'https://127.0.0.1:3000',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:3000',
+    'https://localhost:8000',
+    'https://127.0.0.1:8000',
+    'https://127.0.0.1:3000',
+]
+
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+]
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -145,9 +166,34 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL  = '/static/'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'build/static')
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 12
+}
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backend.google.GoogleOAuth2',
+    'social_core.backend.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
