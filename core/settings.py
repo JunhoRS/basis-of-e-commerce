@@ -11,26 +11,31 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
+import os
+import environ
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+env = environ.Env()
+environ.Env.read_env()
+ENVIRONMENT = env
+# Build paths inside the project like this: BASE_DIR / 'subdir'.\
+    
+    
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-r74r(7jdv6c=8!b1ay-xru7psc8f-0^^lhh8!@&%9n^ih+t-s*'
+SECRET_KEY = os._Environ('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,8 +44,36 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+PROJECT_APPS=[]
+ECOMMERCE_APPS=[]
+THIRD_PARTY_APPS=[
+    'corsheaders',
+    'rest_framework',
+    'djoser',
+    'social_django',
+    'rest_framework_simplejwt',
+    'rest_framework.token_blacklist',
+    'ckeditor',
+    'ckeditor_uploader',
+]
+
+INSTALLED_APPS= DJANGO_APPS + PROJECT_APPS + ECOMMERCE_APPS + THIRD_PARTY_APPS
+
+CKEDITOR_CONFIG = {
+    'default': {
+        'toolbar': 'full',
+        'autoParagraph': False
+    }
+}
+
+CKEDITOR_UPLOAD_PATH = "/media/"
+
 MIDDLEWARE = [
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+    'corsheaders.middleware.CoreMiddleware'
+    
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,7 +87,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,12 +107,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": env.db("DATABASE_URL", default="postgres:///dbecommerce")
 }
-
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
