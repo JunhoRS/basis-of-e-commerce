@@ -1,20 +1,28 @@
 import Layout from '../../hocs/Layout'
 import { useState, useEffect } from 'react'
-function Signup() {
+
+import {connect} from 'react-redux'
+import { signup } from '../../redux/actions/auth'
+
+const Signup = ({
+  signup
+}) => {
 
   useEffect(() => {
-    windows.scrollTo(0,0)
-  }, [input])
+    window.scrollTo(0,0)
+  }, [])
 
-  const [formdata, setFormData] = useState({
-        first_name: '',
-        last_name: '',
-        email: '',
-        password: '',
-        re_password: ''
+  const [accountCreated, setAccountCreated] = useState(false);
+
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    re_password: ''
   })
 
-  const {
+  const { 
     first_name,
     last_name,
     email,
@@ -22,12 +30,15 @@ function Signup() {
     re_password
   } = formData;
 
-  const onChange = e => setFormData({ ...formdata, [e.target.name]: e.target.value });
+  const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = e => setFormData{ 
-    e.preventDefault(),
-    console.log(formData)
+  const onSubmit = e =>{
+    e.preventDefault();
+    signup(first_name, last_name, email, password, re_password);
+    setAccountCreated(true);
+    window.scrollTo(0,0)
   }
+
   return (
     <Layout>
       {/*
@@ -65,6 +76,8 @@ function Signup() {
                 <div className="mt-1">
                   <input
                     name="first_name"
+                    value={first_name}
+                    onChange={e=>onChange(e)}
                     type="text"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -79,6 +92,8 @@ function Signup() {
                 <div className="mt-1">
                   <input
                     name="last_name"
+                    value={last_name}
+                    onChange={e=>onChange(e)}
                     type="text"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -93,6 +108,8 @@ function Signup() {
                 <div className="mt-1">
                   <input
                     name="email"
+                    value={email}
+                    onChange={e=>onChange(e)}
                     type="email"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -107,6 +124,8 @@ function Signup() {
                 <div className="mt-1">
                   <input
                     name="password"
+                    value={password}
+                    onChange={e=>onChange(e)}
                     type="password"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -115,12 +134,14 @@ function Signup() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="re_password" className="block text-sm font-medium text-gray-700">
                   Repeat Password
                 </label>
                 <div className="mt-1">
                   <input
-                    name="password"
+                    name="re_password"
+                    value={re_password}
+                    onChange={e=>onChange(e)}
                     type="password"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -163,5 +184,10 @@ function Signup() {
     </Layout>
   )
 }
+const mapStateToProps = state => ({
 
-export default Signup
+})
+
+export default connect(mapStateToProps, {
+  signup
+}) (Signup)
